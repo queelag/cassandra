@@ -21,6 +21,7 @@
     "webpack-cli": "^3.3.12"
   },
   "dependencies": {
+    "ajv": "^6.12.4",
     "cassandra-driver": "^4.6.0",
     "lodash": "^4.17.20"
   },
