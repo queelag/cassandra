@@ -15,7 +15,10 @@ class RowUtils {
 
         switch (true) {
           case v instanceof types.Uuid:
-            r[k] = v.toString()
+            r[k] = (v as types.Uuid).toString()
+            break
+          case v instanceof types.Long:
+            r[k] = (v as types.Long).toNumber()
             break
           case typeof v === 'object':
             r[k] = JSONUtils.reduceToCamelCase(v)
