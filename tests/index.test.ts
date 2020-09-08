@@ -3,7 +3,7 @@ import Cassandra, { Table } from '../src/index'
 
 const chance = new Chance()
 const dummy = {
-  user: { id: '', name: '', surname: '' }
+  user: { id: '', name: '', surname: '', postalCode: '' }
 }
 
 describe('Cassandra', () => {
@@ -25,8 +25,9 @@ describe('Cassandra', () => {
   it('writes single record', async () => {
     user.name = chance.first()
     user.surname = chance.last()
+    user.postalCode = chance.postal()
 
-    user.id = await users.write({ name: user.name, surname: user.surname })
+    user.id = await users.write({ name: user.name, surname: user.surname, postalCode: user.postalCode })
     expect(user.id.length).toBeGreaterThan(0)
   })
 
@@ -37,6 +38,7 @@ describe('Cassandra', () => {
   it('updates previous record', async () => {
     user.name = chance.first()
     user.surname = chance.last()
+    user.postalCode = chance.postal()
 
     user.id = await users.write(user)
     expect(user.id.length).toBeGreaterThan(0)
@@ -52,6 +54,7 @@ describe('Cassandra', () => {
 
     user.name = chance.first()
     user.surname = chance.last()
+    user.postalCode = chance.postal()
 
     user.id = await users.write(user)
     expect(user.id.length).toBeGreaterThan(0)
@@ -85,4 +88,5 @@ type User = {
   id?: string
   name: string
   surname: string
+  postalCode: string
 }

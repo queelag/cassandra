@@ -1,6 +1,7 @@
 import { types } from 'cassandra-driver'
 import { camelCase, reduce } from 'lodash'
 import { Row } from '../definitions/types'
+import JSONUtils from './json.utils'
 
 class RowUtils {
   static toRecord<T>(row: Row): T {
@@ -16,6 +17,8 @@ class RowUtils {
           case v instanceof types.Uuid:
             r[k] = v.toString()
             break
+          case typeof v === 'object':
+            r[k] = JSONUtils.reduceToCamelCase(v)
           default:
             r[k] = v
         }

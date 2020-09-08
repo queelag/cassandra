@@ -8,6 +8,7 @@ import clone from '../modules/clone'
 import ID from '../modules/id'
 import tcp from '../modules/tcp'
 import BufferUtils from '../utils/buffer.utils'
+import JSONUtils from '../utils/json.utils'
 import RowUtils from '../utils/row.utils'
 
 class Table<T extends Record> extends Child {
@@ -72,7 +73,7 @@ class Table<T extends Record> extends Child {
     clone.id = data.id || (await ID.unique(this))
     if (id instanceof Error) return ''
 
-    result = await this.execute(`INSERT INTO ${this.name} JSON ?`, [JSON.stringify(clone)], options)
+    result = await this.execute(`INSERT INTO ${this.name} JSON ?`, [JSONUtils.stringify(clone)], options)
     if (result instanceof Error) return ''
 
     return clone.id

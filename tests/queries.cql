@@ -2,6 +2,7 @@ CREATE TABLE users (
     id uuid,
     name text,
     surname text,
+    postal_code text,
     PRIMARY KEY (id)
 );
 
