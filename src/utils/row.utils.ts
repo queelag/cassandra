@@ -1,5 +1,5 @@
 import { types } from 'cassandra-driver'
-import { reduce } from 'lodash'
+import { camelCase, reduce } from 'lodash'
 import { Row } from '../definitions/types'
 
 class RowUtils {
@@ -10,6 +10,7 @@ class RowUtils {
         let v: any
 
         v = row.get(k)
+        k = camelCase(k)
 
         switch (true) {
           case v instanceof types.Uuid:
