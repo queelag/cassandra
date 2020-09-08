@@ -1,9 +1,8 @@
 CREATE TABLE users (
-    id timeuuid,
+    id uuid,
     name text,
     surname text,
-    stamp timestamp,
-    PRIMARY KEY (id, stamp)
+    PRIMARY KEY (id)
 );
 
 CREATE INDEX name_index ON users(name);

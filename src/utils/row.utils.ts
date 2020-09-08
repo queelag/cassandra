@@ -12,7 +12,7 @@ class RowUtils {
         v = row.get(k)
 
         switch (true) {
-          case v instanceof types.TimeUuid:
+          case v instanceof types.Uuid:
             r[k] = v.toString()
             break
           default:

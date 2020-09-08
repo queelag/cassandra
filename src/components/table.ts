@@ -68,10 +68,9 @@ class Table<T extends Record> extends Child {
       return ''
     }
 
-    id = data.id || (await ID.unique(this))
+    // @ts-ignore
+    clone.id = data.id || (await ID.unique(this))
     if (id instanceof Error) return ''
-
-    clone.id = data.id || id
 
     result = await this.execute(`INSERT INTO ${this.name} JSON ?`, [JSON.stringify(clone)], options)
     if (result instanceof Error) return ''
