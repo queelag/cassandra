@@ -13,7 +13,8 @@ import RowUtils from '../utils/row.utils'
 class Table<T extends Record> extends Child {
   private readonly dummy: T
   private readonly name: string
-  private readonly validate: ValidateFunction
+
+  public readonly validate: ValidateFunction
 
   constructor(cassandra: Cassandra, name: string, dummy: T, schema: object) {
     super(cassandra)
