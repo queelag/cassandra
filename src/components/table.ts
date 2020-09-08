@@ -5,8 +5,8 @@ import Cassandra from '..'
 import { Record, ResultSet } from '../definitions/types'
 import Child from '../modules/child'
 import clone from '../modules/clone'
+import ID from '../modules/id'
 import tcp from '../modules/tcp'
-import TimeUUID from '../modules/time.uuid'
 import BufferUtils from '../utils/buffer.utils'
 import RowUtils from '../utils/row.utils'
 
@@ -58,7 +58,7 @@ class Table<T extends Record> extends Child {
   }
 
   public async write(data: T, options?: QueryOptions): Promise<string> {
-    let clone: T, result: ResultSet | Error
+    let clone: T, id: string | Error, result: ResultSet | Error
 
     clone = deserialize(serialize(data))
     delete clone.id
@@ -68,16 +68,19 @@ class Table<T extends Record> extends Child {
       return ''
     }
 
-    clone.id = data.id || TimeUUID.now().toString()
+    id = data.id || (await ID.unique(this))
+    if (id instanceof Error) return ''
 
-    result = await this.execute(`INSERT INTO ${this.name} JSON '${JSON.stringify(clone)}'`, [], options)
+    clone.id = data.id || id
+
+    result = await this.execute(`INSERT INTO ${this.name} JSON ?`, [JSON.stringify(clone)], options)
     if (result instanceof Error) return ''
 
     return clone.id
   }
 
   public async unlink(id: string, options?: QueryOptions): Promise<boolean> {
-    return this.delete(`DELETE FROM ${this.name} WHERE id = ${id}`, [], options)
+    return this.delete(`DELETE FROM ${this.name} WHERE id = ?`, [id], options)
   }
 
   public async delete(query: string, params?: any[], options?: QueryOptions): Promise<boolean> {
@@ -87,6 +90,15 @@ class Table<T extends Record> extends Child {
     if (result instanceof Error) return false
 
     return true
+  }
+
+  public async exists(id: string): Promise<boolean | Error> {
+    let result: ResultSet | Error
+
+    result = await this.execute(`SELECT id FROM ${this.name} WHERE id = ? LIMIT 1`, [id], { fetchSize: 1 })
+    if (result instanceof Error) return result
+
+    return result.first() !== null
   }
 
   private async execute(query: string, params: any[] = [], options: QueryOptions = {}): Promise<ResultSet | Error> {
