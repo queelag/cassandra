@@ -17,6 +17,12 @@ class RowUtils {
           case v instanceof types.Uuid:
             r[k] = (v as types.Uuid).toString()
             break
+          case v instanceof types.InetAddress:
+            r[k] = (v as types.InetAddress).toString()
+            break
+          case v instanceof Date:
+            r[k] = (v as Date).valueOf()
+            break
           case typeof v === 'object':
             r[k] = JSONUtils.reduceToCamelCase(v)
           default:
