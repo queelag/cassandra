@@ -1,9 +1,9 @@
 import Chance from 'chance'
 import Cassandra, { Table } from '../src/index'
 
-const chance = new Chance()
-const dummy = {
-  user: { id: '', name: '', surname: '', postalCode: '' }
+const chance: Chance.Chance = new Chance()
+const dummy: { user: User } = {
+  user: { id: '', name: '', surname: '', bbPin: '', billing: { address: '', postalCode: '' } }
 }
 
 describe('Cassandra', () => {
@@ -23,11 +23,17 @@ describe('Cassandra', () => {
   })
 
   it('writes single record', async () => {
+    delete user.id
+
     user.name = chance.first()
     user.surname = chance.last()
-    user.postalCode = chance.postal()
+    user.bbPin = chance.bb_pin()
+    user.billing = {
+      address: chance.address(),
+      postalCode: chance.postal()
+    }
 
-    user.id = await users.write({ name: user.name, surname: user.surname, postalCode: user.postalCode })
+    user.id = await users.write(user)
     expect(user.id.length).toBeGreaterThan(0)
   })
 
@@ -38,7 +44,11 @@ describe('Cassandra', () => {
   it('updates previous record', async () => {
     user.name = chance.first()
     user.surname = chance.last()
-    user.postalCode = chance.postal()
+    user.bbPin = chance.bb_pin()
+    user.billing = {
+      address: chance.address(),
+      postalCode: chance.postal()
+    }
 
     user.id = await users.write(user)
     expect(user.id.length).toBeGreaterThan(0)
@@ -54,7 +64,11 @@ describe('Cassandra', () => {
 
     user.name = chance.first()
     user.surname = chance.last()
-    user.postalCode = chance.postal()
+    user.bbPin = chance.bb_pin()
+    user.billing = {
+      address: chance.address(),
+      postalCode: chance.postal()
+    }
 
     user.id = await users.write(user)
     expect(user.id.length).toBeGreaterThan(0)
@@ -88,5 +102,10 @@ type User = {
   id?: string
   name: string
   surname: string
-  postalCode: string
+  bbPin: string
+  billing: {
+    address: string
+    postalCode: string
+  }
+  timestamp?: number
 }
