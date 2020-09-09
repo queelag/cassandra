@@ -11,7 +11,6 @@ describe('Cassandra', () => {
 
   beforeAll(async () => {
     cassandra = new Cassandra({ contactPoints: ['127.0.0.1:9042'], localDataCenter: 'datacenter1', keyspace: 'database' })
-    await cassandra.client.connect()
 
     users = new Table<User>(cassandra, 'users', dummy.user, {})
     await users.initialization()

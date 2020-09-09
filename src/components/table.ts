@@ -29,10 +29,12 @@ class Table<T extends Record> extends Child {
     this.columns = []
     this.validate = new AJV().compile(schema)
 
-    this.cassandra.client.metadata.getTable(this.cassandra.client.keyspace, this.name).then((v) => {
-      this.columns = v.columns
-      this.status = Status.ON
-    })
+    this.cassandra.initialization().then(() =>
+      this.cassandra.client.metadata.getTable(this.cassandra.client.keyspace, this.name).then((v) => {
+        this.columns = v.columns
+        this.status = Status.ON
+      })
+    )
   }
 
   public async read(id: string, options?: QueryOptions): Promise<T> {
