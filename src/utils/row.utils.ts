@@ -30,6 +30,9 @@ class RowUtils {
           case v instanceof Date:
             r[k] = (v as Date).valueOf()
             break
+          case v instanceof Array:
+            r[k] = Object.values(this.reduceToSimpleTypes<T>(v))
+            break
           case isPlainObject(v):
             r[k] = this.reduceToSimpleTypes<T>(v)
             break

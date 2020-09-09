@@ -16,8 +16,11 @@ class JSONUtils {
         k = camelCase(k)
 
         switch (true) {
+          case v instanceof Array:
+            r[k] = Object.values(this.reduceToCamelCase<T>(v))
+            break
           case isPlainObject(v):
-            r[k] = this.reduceToCamelCase(v)
+            r[k] = this.reduceToCamelCase<T>(v)
             break
           default:
             r[k] = v
@@ -37,6 +40,9 @@ class JSONUtils {
         k = snakeCase(k)
 
         switch (true) {
+          case v instanceof Array:
+            r[k] = Object.values(this.reduceToCamelCase<T>(v))
+            break
           case isPlainObject(v):
             r[k] = this.reduceToSnakeCase(v)
             break
