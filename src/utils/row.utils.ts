@@ -1,19 +1,26 @@
 import { types } from 'cassandra-driver'
 import { camelCase, isPlainObject, reduce } from 'lodash'
 import { Row } from '../definitions/types'
-import JSONUtils from './json.utils'
 
 class RowUtils {
   static toRecord<T>(row: Row): T {
-    return reduce(
-      row ? row.keys() : [],
-      (r: T, k: string) => {
-        let v: any
+    return this.reduceToSimpleTypes(reduce(row ? row.keys() : [], (r: T, k: string) => ({ ...r, [k]: row.get(k) }), {} as T))
+  }
 
-        v = row.get(k)
+  static toRecords<T>(rows: Row[]): T[] {
+    return reduce(rows, (r: T[], v: Row) => [...r, this.toRecord(v)], [])
+  }
+
+  static reduceToSimpleTypes<T extends object>(v: T): T {
+    return reduce(
+      v,
+      (r: T, v: any, k: string) => {
         k = camelCase(k)
 
         switch (true) {
+          case v === null:
+            r[k] = []
+            break
           case v instanceof types.Uuid:
             r[k] = (v as types.Uuid).toString()
             break
@@ -24,7 +31,7 @@ class RowUtils {
             r[k] = (v as Date).valueOf()
             break
           case isPlainObject(v):
-            r[k] = JSONUtils.reduceToCamelCase(v)
+            r[k] = this.reduceToSimpleTypes<T>(v)
             break
           default:
             r[k] = v
@@ -35,10 +42,6 @@ class RowUtils {
       },
       {} as T
     )
-  }
-
-  static toRecords<T>(rows: Row[]): T[] {
-    return reduce(rows, (r: T[], v: Row) => [...r, this.toRecord(v)], [])
   }
 }
 
