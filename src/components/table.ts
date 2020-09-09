@@ -60,6 +60,7 @@ class Table<T extends Record> extends Child {
 
     clone = deserialize(serialize(data))
     delete clone.id
+    delete clone.timestamp
 
     if (!this.validate(clone)) {
       console.error(this.validate.errors)
