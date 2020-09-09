@@ -25,8 +25,10 @@ class RowUtils {
             break
           case typeof v === 'object':
             r[k] = JSONUtils.reduceToCamelCase(v)
+            break
           default:
             r[k] = v
+            break
         }
 
         return r
