@@ -14,6 +14,7 @@ describe('Cassandra', () => {
     await cassandra.client.connect()
 
     users = new Table<User>(cassandra, 'users', dummy.user, {})
+    await users.initialization()
 
     user = dummy.user
   })

@@ -1,40 +1,47 @@
 import { types } from 'cassandra-driver'
-import { camelCase, isPlainObject, reduce } from 'lodash'
-import { Row } from '../definitions/types'
+import { camelCase, reduce } from 'lodash'
+import { ColumnInfo, Row } from '../definitions/types'
+import ColumnUtils from './column.utils'
 
 class RowUtils {
-  static toRecord<T>(row: Row): T {
-    return this.reduceToSimpleTypes(reduce(row ? row.keys() : [], (r: T, k: string) => ({ ...r, [k]: row.get(k) }), {} as T))
+  static toRecord<T>(columns: ColumnInfo[], row: Row): T {
+    return this.reduceToSimpleTypes(
+      columns,
+      reduce(row ? row.keys() : [], (r: T, k: string) => ({ ...r, [k]: row.get(k) }), {} as T)
+    )
   }
 
-  static toRecords<T>(rows: Row[]): T[] {
-    return reduce(rows, (r: T[], v: Row) => [...r, this.toRecord(v)], [])
+  static toRecords<T>(columns: ColumnInfo[], rows: Row[]): T[] {
+    return reduce(rows, (r: T[], v: Row) => [...r, this.toRecord(columns, v)], [])
   }
 
-  static reduceToSimpleTypes<T extends object>(v: T): T {
+  static reduceToSimpleTypes<T extends object>(columns: ColumnInfo[], v: T, root: string[] = []): T {
     return reduce(
       v,
       (r: T, v: any, k: string) => {
-        k = camelCase(k)
+        let key: string, type: number
+
+        key = camelCase(k)
+        type = ColumnUtils.findTypeByPath(columns, root.concat(k))
 
         switch (true) {
-          case v instanceof types.Uuid:
-            r[k] = (v as types.Uuid).toString()
+          case type === 12:
+            r[key] = (v as types.Uuid).toString()
             break
-          case v instanceof types.InetAddress:
-            r[k] = (v as types.InetAddress).toString()
+          case type === 16:
+            r[key] = (v as types.InetAddress).toString()
             break
-          case v instanceof Date:
-            r[k] = (v as Date).valueOf()
+          case type === 11:
+            r[key] = (v as Date).valueOf()
             break
-          case v instanceof Array:
-            r[k] = Object.values(this.reduceToSimpleTypes<T>(v))
+          case type === 34:
+            r[key] = Object.values(this.reduceToSimpleTypes<T>(columns, v, root.concat(k)))
             break
-          case isPlainObject(v):
-            r[k] = this.reduceToSimpleTypes<T>(v)
+          case type === 48:
+            r[key] = this.reduceToSimpleTypes<T>(columns, v, root.concat(k))
             break
           default:
-            r[k] = v
+            r[key] = v
             break
         }
 

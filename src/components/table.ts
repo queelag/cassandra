@@ -2,7 +2,8 @@ import AJV, { ValidateFunction } from 'ajv'
 import { QueryOptions } from 'cassandra-driver'
 import { deserialize, serialize } from 'v8'
 import Cassandra from '..'
-import { Record, ResultSet } from '../definitions/types'
+import { Status } from '../definitions/enums'
+import { ColumnInfo, Record, ResultSet } from '../definitions/types'
 import Child from '../modules/child'
 import clone from '../modules/clone'
 import ID from '../modules/id'
@@ -13,7 +14,9 @@ import RowUtils from '../utils/row.utils'
 class Table<T extends Record> extends Child {
   private readonly dummy: T
   private readonly name: string
+  private status: Status
 
+  public columns: ColumnInfo[]
   public readonly validate: ValidateFunction
 
   constructor(cassandra: Cassandra, name: string, dummy: T, schema: object) {
@@ -21,7 +24,15 @@ class Table<T extends Record> extends Child {
 
     this.dummy = dummy
     this.name = name
+    this.status = Status.OFF
+
+    this.columns = []
     this.validate = new AJV().compile(schema)
+
+    this.cassandra.client.metadata.getTable(this.cassandra.client.keyspace, this.name).then((v) => {
+      this.columns = v.columns
+      this.status = Status.ON
+    })
   }
 
   public async read(id: string, options?: QueryOptions): Promise<T> {
@@ -38,7 +49,7 @@ class Table<T extends Record> extends Child {
     result = await this.execute(query, params, { fetchSize: 1, ...options })
     if (result instanceof Error) return clone<T>(this.dummy)
 
-    record = RowUtils.toRecord(result.first())
+    record = RowUtils.toRecord(this.columns, result.first())
     if (Object.keys(record).length <= 0) return clone<T>(this.dummy)
 
     return record
@@ -50,7 +61,7 @@ class Table<T extends Record> extends Child {
     result = await this.execute(query, params, options)
     if (result instanceof Error) return []
 
-    records = RowUtils.toRecords(result.rows)
+    records = RowUtils.toRecords(this.columns, result.rows)
 
     return records
   }
@@ -101,8 +112,12 @@ class Table<T extends Record> extends Child {
     return result.first() !== null
   }
 
+  public async initialization(): Promise<void> {
+    return new Promise<void>((r) => setInterval(() => this.status === Status.ON && r(), 100))
+  }
+
   private async execute(query: string, params: any[] = [], options: QueryOptions = {}): Promise<ResultSet | Error> {
-    return tcp(() => this.cassandra.client.execute(query, params, { prepare: true, ...options }))
+    return this.status === Status.ON ? tcp(() => this.cassandra.client.execute(query, params, { prepare: true, ...options })) : new Error()
   }
 }
 
