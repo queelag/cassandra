@@ -1,5 +1,5 @@
 import { types } from 'cassandra-driver'
-import { camelCase, reduce } from 'lodash'
+import { camelCase, isPlainObject, reduce } from 'lodash'
 import { Row } from '../definitions/types'
 import JSONUtils from './json.utils'
 
@@ -23,7 +23,7 @@ class RowUtils {
           case v instanceof Date:
             r[k] = (v as Date).valueOf()
             break
-          case typeof v === 'object':
+          case isPlainObject(v):
             r[k] = JSONUtils.reduceToCamelCase(v)
             break
           default:
