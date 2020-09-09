@@ -18,9 +18,6 @@ class RowUtils {
         k = camelCase(k)
 
         switch (true) {
-          case v === null:
-            r[k] = []
-            break
           case v instanceof types.Uuid:
             r[k] = (v as types.Uuid).toString()
             break
