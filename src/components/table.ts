@@ -3,7 +3,7 @@ import { QueryOptions } from 'cassandra-driver'
 import { deserialize, serialize } from 'v8'
 import Cassandra from '..'
 import { Status } from '../definitions/enums'
-import { ColumnInfo, Record, ResultSet } from '../definitions/types'
+import { Record, ResultSet } from '../definitions/types'
 import Child from '../modules/child'
 import clone from '../modules/clone'
 import ID from '../modules/id'
@@ -16,7 +16,6 @@ class Table<T extends Record> extends Child {
   private readonly name: string
   private status: Status
 
-  public columns: ColumnInfo[]
   public readonly validate: ValidateFunction
 
   constructor(cassandra: Cassandra, name: string, dummy: T, schema: object) {
@@ -26,15 +25,9 @@ class Table<T extends Record> extends Child {
     this.name = name
     this.status = Status.OFF
 
-    this.columns = []
     this.validate = new AJV().compile(schema)
 
-    this.cassandra.initialization().then(() =>
-      this.cassandra.client.metadata.getTable(this.cassandra.client.keyspace, this.name).then((v) => {
-        this.columns = v.columns
-        this.status = Status.ON
-      })
-    )
+    this.cassandra.initialization().then(() => (this.status = Status.ON))
   }
 
   public async read(id: string, options?: QueryOptions): Promise<T> {
@@ -51,7 +44,7 @@ class Table<T extends Record> extends Child {
     result = await this.execute(query, params, { fetchSize: 1, ...options })
     if (result instanceof Error) return clone<T>(this.dummy)
 
-    record = RowUtils.toRecord(this.columns, result.first())
+    record = RowUtils.toRecord(result.columns, result.first())
     if (Object.keys(record).length <= 0) return clone<T>(this.dummy)
 
     return record
@@ -63,7 +56,7 @@ class Table<T extends Record> extends Child {
     result = await this.execute(query, params, options)
     if (result instanceof Error) return []
 
-    records = RowUtils.toRecords(this.columns, result.rows)
+    records = RowUtils.toRecords(result.columns, result.rows)
 
     return records
   }

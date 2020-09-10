@@ -3,7 +3,7 @@ import Cassandra, { Table } from '../src/index'
 
 const chance: Chance.Chance = new Chance()
 const dummy: { user: User } = {
-  user: { id: '', name: '', surname: '', bbPin: '', billing: { address: '', postalCode: '' } }
+  user: { id: '', name: '', surname: '', bbPin: '', billings: [] }
 }
 
 describe('Cassandra', () => {
@@ -28,10 +28,13 @@ describe('Cassandra', () => {
     user.name = chance.first()
     user.surname = chance.last()
     user.bbPin = chance.bb_pin()
-    user.billing = {
-      address: chance.address(),
-      postalCode: chance.postal()
-    }
+    user.billings = [
+      {
+        address: chance.address(),
+        cards: [chance.guid()],
+        postalCode: chance.postal()
+      }
+    ]
 
     user.id = await users.write(user)
     expect(user.id.length).toBeGreaterThan(0)
@@ -45,10 +48,13 @@ describe('Cassandra', () => {
     user.name = chance.first()
     user.surname = chance.last()
     user.bbPin = chance.bb_pin()
-    user.billing = {
-      address: chance.address(),
-      postalCode: chance.postal()
-    }
+    user.billings = [
+      {
+        address: chance.address(),
+        cards: [chance.guid()],
+        postalCode: chance.postal()
+      }
+    ]
 
     user.id = await users.write(user)
     expect(user.id.length).toBeGreaterThan(0)
@@ -65,10 +71,13 @@ describe('Cassandra', () => {
     user.name = chance.first()
     user.surname = chance.last()
     user.bbPin = chance.bb_pin()
-    user.billing = {
-      address: chance.address(),
-      postalCode: chance.postal()
-    }
+    user.billings = [
+      {
+        address: chance.address(),
+        cards: [chance.guid()],
+        postalCode: chance.postal()
+      }
+    ]
 
     user.id = await users.write(user)
     expect(user.id.length).toBeGreaterThan(0)
@@ -103,9 +112,10 @@ type User = {
   name: string
   surname: string
   bbPin: string
-  billing: {
+  billings: {
     address: string
+    cards: string[]
     postalCode: string
-  }
+  }[]
   timestamp?: number
 }

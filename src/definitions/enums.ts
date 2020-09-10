@@ -2,3 +2,33 @@ export enum Status {
   OFF,
   ON
 }
+
+export enum DataType {
+  CUSTOM = 0x0000,
+  ASCII = 0x0001,
+  BIGINT = 0x0002,
+  BLOB = 0x0003,
+  BOOLEAN = 0x0004,
+  COUNTER = 0x0005,
+  DECIMAL = 0x0006,
+  DOUBLE = 0x0007,
+  FLOAT = 0x0008,
+  INT = 0x0009,
+  TEXT = 0x000a,
+  TIMESTAMP = 0x000b,
+  UUID = 0x000c,
+  VARCHAR = 0x000d,
+  VARINT = 0x000e,
+  TIMEUUID = 0x000f,
+  INET = 0x0010,
+  DATE = 0x0011,
+  TIME = 0x0012,
+  SMALLINT = 0x0013,
+  TINYINT = 0x0014,
+  DURATION = 0x0015,
+  LIST = 0x0020,
+  MAP = 0x0021,
+  SET = 0x0022,
+  UDT = 0x0030,
+  TUPLE = 0x0031
+}

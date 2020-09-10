@@ -1,5 +1,6 @@
 CREATE TYPE user_billing (
     "address" text,
+    "cards" set<uuid>,
     "postal_code" text
 );
 
@@ -8,7 +9,7 @@ CREATE TABLE users (
     "name" text,
     "surname" text,
     "bb_pin" text,
-    "billing" frozen<user_billing>,
+    "billings" set<frozen<user_billing>>,
     "timestamp" timestamp,
     PRIMARY KEY ("id")
 );

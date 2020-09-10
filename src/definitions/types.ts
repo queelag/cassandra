@@ -1,4 +1,4 @@
-import { metadata, types } from 'cassandra-driver'
+import { types } from 'cassandra-driver'
 
 export type Record = {
   id?: string
@@ -7,4 +7,5 @@ export type Record = {
 
 export interface Row extends types.Row {}
 export interface ResultSet extends types.ResultSet {}
-export interface ColumnInfo extends metadata.ColumnInfo {}
+
+export type Column = { name: string; type: { code: number; info: any } }

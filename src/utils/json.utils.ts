@@ -1,4 +1,4 @@
-import { camelCase, isPlainObject, reduce, snakeCase } from 'lodash'
+import { camelCase, isArray, isPlainObject, reduce, snakeCase } from 'lodash'
 
 class JSONUtils {
   static parse<T extends object>(v: string): T {
@@ -16,7 +16,7 @@ class JSONUtils {
         k = camelCase(k)
 
         switch (true) {
-          case v instanceof Array:
+          case isArray(v):
             r[k] = Object.values(this.reduceToCamelCase<T>(v))
             break
           case isPlainObject(v):
@@ -40,7 +40,7 @@ class JSONUtils {
         k = snakeCase(k)
 
         switch (true) {
-          case v instanceof Array:
+          case isArray(v):
             r[k] = Object.values(this.reduceToSnakeCase<T>(v))
             break
           case isPlainObject(v):
