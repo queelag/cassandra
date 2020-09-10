@@ -26,8 +26,6 @@ class RowUtils {
         type = ColumnUtils.findTypeByPath(columns, root.concat(k))
 
         switch (true) {
-          case v === null:
-            break
           case type === DataType.UUID:
             r[key] = (v as types.Uuid).toString()
             break
@@ -47,6 +45,8 @@ class RowUtils {
             r[key] = v
             break
         }
+
+        if (r[key] === null) delete r[key]
 
         return r
       },
