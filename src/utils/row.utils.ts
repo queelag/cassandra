@@ -35,6 +35,7 @@ class RowUtils {
           case type === DataType.TIMESTAMP:
             r[key] = (v as Date).valueOf()
             break
+          case type === DataType.LIST:
           case type === DataType.SET:
             r[key] = Object.values(this.reduceToSimpleTypes<T>(columns, v, root.concat(k)))
             break
