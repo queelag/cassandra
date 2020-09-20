@@ -88,6 +88,10 @@ describe('Cassandra', () => {
     expect(await users.read(user.id)).toMatchObject(dummy.user)
   })
 
+  it('counts records', async () => {
+    expect(await users.count('SELECT COUNT(*) FROM users')).toBe(1)
+  })
+
   it('deletes all records', async () => {
     let all: User[], ids: string[]
 

@@ -107,6 +107,15 @@ class Table<T extends Record> extends Child {
     return result.first() !== null
   }
 
+  public async count(query: string, params?: any[], options?: QueryOptions): Promise<number> {
+    let result: ResultSet | Error
+
+    result = await this.execute(query, params, options)
+    if (result instanceof Error) return 0
+
+    return (result.first().get('count') as Long).toNumber()
+  }
+
   public async initialization(): Promise<void> {
     return new Promise<void>((r) => setInterval(() => this.status === Status.ON && r(), 100))
   }
