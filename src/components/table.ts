@@ -31,7 +31,7 @@ class Table<T extends Record> extends Child {
   }
 
   public async read(id: string, options?: QueryOptions): Promise<T> {
-    return this.find(`SELECT * FROM ${this.name} WHERE id = ${id}`, [], options)
+    return this.find(`SELECT * FROM ${this.name} WHERE id = ?`, [id], options)
   }
 
   public async all(options?: QueryOptions): Promise<T[]> {
