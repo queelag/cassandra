@@ -121,7 +121,11 @@ class Table<T extends Record> extends Child {
   }
 
   private async execute(query: string, params: any[] = [], options: QueryOptions = {}): Promise<ResultSet | Error> {
-    return this.status === Status.ON ? tcp(() => this.cassandra.client.execute(query, params, { prepare: true, ...options })) : new Error()
+    return this.status === Status.ON
+      ? params.includes('')
+        ? new Error()
+        : tcp(() => this.cassandra.client.execute(query, params, { prepare: true, ...options }))
+      : new Error()
   }
 }
 
