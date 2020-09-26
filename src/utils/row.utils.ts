@@ -40,6 +40,7 @@ class RowUtils {
             r[key] = Object.values(this.reduceToSimpleTypes<T>(columns, v, root.concat(k)))
             break
           case type === DataType.UDT:
+          case type === DataType.MAP:
             r[key] = this.reduceToSimpleTypes<T>(columns, v, root.concat(k))
             break
           default:
