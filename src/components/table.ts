@@ -98,11 +98,11 @@ class Table<T extends Record> extends Child {
     return true
   }
 
-  public async exists(id: string): Promise<boolean> {
+  public async exists(id: string): Promise<boolean | Error> {
     let result: ResultSet | Error
 
     result = await this.execute(`SELECT id FROM ${this.name} WHERE id = ? LIMIT 1`, [id], { fetchSize: 1 })
-    if (result instanceof Error) return false
+    if (result instanceof Error) return result
 
     return result.first() !== null
   }
