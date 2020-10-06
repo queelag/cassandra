@@ -1,7 +1,9 @@
 import { types } from 'cassandra-driver'
 
+export type Identity = string | number
+
 export type Record = {
-  id?: any
+  id?: Identity
   timestamp?: number
 }
 
