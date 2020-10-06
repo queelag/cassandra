@@ -1,6 +1,6 @@
 import { types } from 'cassandra-driver'
 
-export type Identity = string | number
+export type Identity = string
 
 export type Record = {
   id?: Identity
