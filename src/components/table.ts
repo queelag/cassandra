@@ -31,7 +31,7 @@ class Table<T extends Record> extends Child {
     this.cassandra.initialization().then(() => (this.status = Status.ON))
   }
 
-  public async read(id: string, options?: QueryOptions): Promise<T> {
+  public async read(id: ID, options?: QueryOptions): Promise<T> {
     return this.find(`SELECT * FROM ${this.name} WHERE id = ?`, [id], options)
   }
 
@@ -62,8 +62,8 @@ class Table<T extends Record> extends Child {
     return records
   }
 
-  public async write(data: T, options?: QueryOptions): Promise<string> {
-    let clone: T, id: string | Error, result: ResultSet | Error
+  public async write(data: T, options?: QueryOptions): Promise<ID> {
+    let clone: T, id: ID | Error, result: ResultSet | Error
 
     clone = deserialize(serialize(data))
     delete clone.id
@@ -86,7 +86,7 @@ class Table<T extends Record> extends Child {
     return clone.id
   }
 
-  public async unlink(id: string, options?: QueryOptions): Promise<boolean> {
+  public async unlink(id: ID, options?: QueryOptions): Promise<boolean> {
     return this.delete(`DELETE FROM ${this.name} WHERE id = ?`, [id], options)
   }
 
@@ -99,7 +99,7 @@ class Table<T extends Record> extends Child {
     return true
   }
 
-  public async exists(id: string): Promise<boolean | Error> {
+  public async exists(id: ID): Promise<boolean | Error> {
     let result: ResultSet | Error
 
     result = await this.execute(`SELECT id FROM ${this.name} WHERE id = ? LIMIT 1`, [id], { fetchSize: 1 })
