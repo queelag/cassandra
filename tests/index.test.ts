@@ -62,7 +62,7 @@ describe('Cassandra', () => {
   })
 
   it('filters by name and surname of previously written record', async () => {
-    expect(await users.filter(`SELECT * FROM users WHERE name = '${user.name}' AND surname = '${user.surname}' ALLOW FILTERING`)).toMatchObject([user])
+    expect(await users.filter('SELECT * FROM users WHERE name = ? AND surname = ? ALLOW FILTERING', [user.name, user.surname])).toMatchObject([user])
   })
 
   it('writes new record', async () => {
@@ -101,7 +101,7 @@ describe('Cassandra', () => {
     ids = all.reduce((r: string[], v: User) => [...r, v.id], [])
     expect(ids).toHaveLength(1)
 
-    expect(await users.delete(`DELETE FROM users WHERE id in (${ids.join(',')})`))
+    expect(await users.delete('DELETE FROM users WHERE id in ?', [ids]))
     expect(await users.all()).toHaveLength(0)
   })
 

@@ -1,5 +1,6 @@
 import AJV, { ValidateFunction } from 'ajv'
 import { QueryOptions } from 'cassandra-driver'
+import { some } from 'lodash'
 import { deserialize, serialize } from 'v8'
 import Cassandra from '..'
 import { Status } from '../definitions/enums'
@@ -122,7 +123,7 @@ class Table<T extends Record> extends Child {
 
   private async execute(query: string, params: any[] = [], options: QueryOptions = {}): Promise<ResultSet | Error> {
     return this.status === Status.ON
-      ? params.includes('')
+      ? some(params, (v: any) => (v.length ? v.length <= 0 : false))
         ? new Error()
         : tcp(() => this.cassandra.client.execute(query, params, { prepare: true, ...options }))
       : new Error()

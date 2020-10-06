@@ -1,7 +1,7 @@
 import { types } from 'cassandra-driver'
 
 export type Record = {
-  id?: string
+  id?: any
   timestamp?: number
 }
 
