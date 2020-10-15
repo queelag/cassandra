@@ -1,4 +1,5 @@
 import { camelCase, isArray, isPlainObject, reduce, snakeCase } from 'lodash'
+import Regex from '../modules/regex'
 
 class JSONUtils {
   static parse<T extends object>(v: string): T {
@@ -13,7 +14,7 @@ class JSONUtils {
     return reduce(
       v,
       (r: T, v: any, k: string) => {
-        k = camelCase(k)
+        k = Regex.snake.test(k) ? camelCase(k) : k
 
         switch (true) {
           case isArray(v):
@@ -37,7 +38,7 @@ class JSONUtils {
     return reduce(
       v,
       (r: T, v: any, k: string) => {
-        k = snakeCase(k)
+        k = Regex.camel.test(k) ? snakeCase(k) : k
 
         switch (true) {
           case isArray(v):

@@ -2,6 +2,7 @@ import { types } from 'cassandra-driver'
 import { camelCase, reduce } from 'lodash'
 import { DataType } from '../definitions/enums'
 import { Column, Row } from '../definitions/types'
+import Regex from '../modules/regex'
 import ColumnUtils from './column.utils'
 
 class RowUtils {
@@ -22,7 +23,7 @@ class RowUtils {
       (r: T, v: any, k: string) => {
         let key: string, type: number
 
-        key = camelCase(k)
+        key = Regex.snake.test(k) ? camelCase(k) : k
         type = ColumnUtils.findTypeByPath(columns, root.concat(k))
 
         switch (true) {

@@ -1,5 +1,6 @@
 import { Client, DseClientOptions } from 'cassandra-driver'
 import Table from './components/table'
+import ID from './modules/id'
 
 class Cassandra {
   public readonly client: Client
@@ -16,4 +17,4 @@ class Cassandra {
 }
 
 export default Cassandra
-export { Table }
+export { ID, Table }
