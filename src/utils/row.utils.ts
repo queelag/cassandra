@@ -28,13 +28,13 @@ class RowUtils {
 
         switch (true) {
           case type === DataType.UUID:
-            r[key] = (v as types.Uuid).toString()
+            r[key] = v ? (v as types.Uuid).toString() : ''
             break
           case type === DataType.INET:
-            r[key] = (v as types.InetAddress).toString()
+            r[key] = v ? (v as types.InetAddress).toString() : ''
             break
           case type === DataType.TIMESTAMP:
-            r[key] = (v as Date).valueOf()
+            r[key] = v ? (v as Date).valueOf() : 0
             break
           case type === DataType.LIST:
           case type === DataType.SET:
