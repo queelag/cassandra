@@ -13,7 +13,7 @@ describe('Cassandra', () => {
     cassandra = new Cassandra({ contactPoints: ['127.0.0.1:9042'], localDataCenter: 'datacenter1', keyspace: 'database' })
 
     users = new Table<User>(cassandra, 'users', dummy.user, {})
-    await users.initialization()
+    await cassandra.initialization()
 
     user = dummy.user
   })

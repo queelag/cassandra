@@ -1,6 +1,6 @@
 import AJV, { ValidateFunction } from 'ajv'
 import { QueryOptions } from 'cassandra-driver'
-import { some } from 'lodash'
+import { get, some } from 'lodash'
 import { deserialize, serialize } from 'v8'
 import Cassandra from '..'
 import { Status } from '../definitions/enums'
@@ -31,24 +31,24 @@ class Table<T extends Record> extends Child {
     this.cassandra.initialization().then(() => (this.status = Status.ON))
   }
 
-  public async read(id: Identity, options?: QueryOptions): Promise<T> {
-    return this.find(`SELECT * FROM ${this.name} WHERE id = ?`, [id], options)
+  public async read<U = T>(id: Identity, keys: string[] = ['*'], path?: string, options?: QueryOptions): Promise<U> {
+    return this.find(`SELECT ${keys.join(',')} FROM ${this.name} WHERE id = ?`, [id], path, options)
   }
 
-  public async all(options?: QueryOptions): Promise<T[]> {
-    return this.filter(`SELECT * FROM ${this.name}`, [], options)
+  public async all(keys: string[] = ['*'], options?: QueryOptions): Promise<T[]> {
+    return this.filter(`SELECT ${keys.join(',')} FROM ${this.name}`, [], options)
   }
 
-  public async find(query: string, params?: any[], options?: QueryOptions): Promise<T> {
+  public async find<U = T>(query: string, params?: any[], path: string = '', options?: QueryOptions): Promise<U> {
     let result: ResultSet | Error, record: T
 
     result = await this.execute(query, params, { fetchSize: 1, ...options })
-    if (result instanceof Error) return clone<T>(this.dummy)
+    if (result instanceof Error) return clone<T>(this.dummy) as any
 
     record = RowUtils.toRecord(result.columns, result.first())
-    if (Object.keys(record).length <= 0) return clone<T>(this.dummy)
+    if (Object.keys(record).length <= 0) return clone<T>(this.dummy) as any
 
-    return record
+    return get(record, path, record)
   }
 
   public async filter(query: string, params?: any[], options?: QueryOptions): Promise<T[]> {
@@ -117,13 +117,9 @@ class Table<T extends Record> extends Child {
     return (result.first().get('count') as Long).toNumber()
   }
 
-  public async initialization(): Promise<void> {
-    return new Promise<void>((r) => setInterval(() => this.status === Status.ON && r(), 100))
-  }
-
   private async execute(query: string, params: any[] = [], options: QueryOptions = {}): Promise<ResultSet | Error> {
     return this.status === Status.ON
-      ? some(params, (v: any) => (v.length ? v.length <= 0 : false))
+      ? some(params, (v: any) => (v.length ? v.length <= 0 : v === 0 ? false : v === false ? false : !v))
         ? new Error()
         : tcp(() => this.cassandra.client.execute(query, params, { prepare: true, ...options }))
       : new Error()
