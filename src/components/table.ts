@@ -4,7 +4,7 @@ import { get, some } from 'lodash'
 import { deserialize, serialize } from 'v8'
 import Cassandra from '..'
 import { Status } from '../definitions/enums'
-import { Identity, Record, ResultSet } from '../definitions/types'
+import { Identity, Keys, Record, ResultSet } from '../definitions/types'
 import Child from '../modules/child'
 import clone from '../modules/clone'
 import ID from '../modules/id'
@@ -31,11 +31,11 @@ class Table<T extends Record> extends Child {
     this.cassandra.initialization().then(() => (this.status = Status.ON))
   }
 
-  public async read<U = T>(id: Identity, keys: string[] = ['*'], path?: string, options?: QueryOptions): Promise<U> {
+  public async read<U = T>(id: Identity, keys: Keys<T> = ['*'], path?: string, options?: QueryOptions): Promise<U> {
     return this.find(`SELECT ${keys.join(',')} FROM ${this.name} WHERE id = ?`, [id], path, options)
   }
 
-  public async all(keys: string[] = ['*'], options?: QueryOptions): Promise<T[]> {
+  public async all(keys: Keys<T> = ['*'], options?: QueryOptions): Promise<T[]> {
     return this.filter(`SELECT ${keys.join(',')} FROM ${this.name}`, [], options)
   }
 
@@ -43,10 +43,10 @@ class Table<T extends Record> extends Child {
     let result: ResultSet | Error, record: T
 
     result = await this.execute(query, params, { fetchSize: 1, ...options })
-    if (result instanceof Error) return clone<T>(this.dummy) as any
+    if (result instanceof Error) return get(clone<T>(this.dummy), path, clone<T>(this.dummy))
 
     record = RowUtils.toRecord(result.columns, result.first())
-    if (Object.keys(record).length <= 0) return clone<T>(this.dummy) as any
+    if (Object.keys(record).length <= 0) return get(clone<T>(this.dummy), path, clone<T>(this.dummy))
 
     return get(record, path, record)
   }

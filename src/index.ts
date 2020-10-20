@@ -1,5 +1,6 @@
 import { Client, DseClientOptions } from 'cassandra-driver'
 import Table from './components/table'
+import { Keys } from './definitions/types'
 import ID from './modules/id'
 
 class Cassandra {
@@ -18,3 +19,4 @@ class Cassandra {
 
 export default Cassandra
 export { ID, Table }
+export { Keys }
