@@ -4,11 +4,12 @@ import { get, some } from 'lodash'
 import { deserialize, serialize } from 'v8'
 import Cassandra from '..'
 import { Status } from '../definitions/enums'
-import { Identity, Keys, Record, ResultSet } from '../definitions/types'
+import { Identity, Keys, Path, Record, ResultSet } from '../definitions/types'
 import Child from '../modules/child'
 import clone from '../modules/clone'
 import ID from '../modules/id'
 import tcp from '../modules/tcp'
+import ColumnUtils from '../utils/column.utils'
 import JSONUtils from '../utils/json.utils'
 import RowUtils from '../utils/row.utils'
 
@@ -31,15 +32,15 @@ class Table<T extends Record> extends Child {
     this.cassandra.initialization().then(() => (this.status = Status.ON))
   }
 
-  public async read<U = T>(id: Identity, keys: Keys<T>[] = ['*'], path?: Keys<T>, options?: QueryOptions): Promise<U> {
-    return this.find(`SELECT ${keys.join(',')} FROM ${this.name} WHERE id = ?`, [id], path, options)
+  public async read<U = T>(id: Identity, keys: Keys<T> = ['*'], path?: Path<T>, options?: QueryOptions): Promise<U> {
+    return this.find(`SELECT ${ColumnUtils.toSnakeCase(keys).join(',')} FROM ${this.name} WHERE id = ?`, [id], path, options)
   }
 
-  public async all(keys: Keys<T>[] = ['*'], path?: Keys<T>, options?: QueryOptions): Promise<T[]> {
-    return this.filter(`SELECT ${keys.join(',')} FROM ${this.name}`, [], path, options)
+  public async all(keys: Keys<T> = ['*'], path?: Path<T>, options?: QueryOptions): Promise<T[]> {
+    return this.filter(`SELECT ${ColumnUtils.toSnakeCase(keys).join(',')} FROM ${this.name}`, [], path, options)
   }
 
-  public async find<U = T>(query: string, params?: any[], path?: Keys<T>, options?: QueryOptions): Promise<U> {
+  public async find<U = T>(query: string, params?: any[], path?: Path<T>, options?: QueryOptions): Promise<U> {
     let result: ResultSet | Error, record: T
 
     result = await this.execute(query, params, { fetchSize: 1, ...options })
@@ -51,7 +52,7 @@ class Table<T extends Record> extends Child {
     return get(record, path, record)
   }
 
-  public async filter<U = T>(query: string, params?: any[], path?: Keys<T>, options?: QueryOptions): Promise<U[]> {
+  public async filter<U = T>(query: string, params?: any[], path?: Path<T>, options?: QueryOptions): Promise<U[]> {
     let result: ResultSet | Error, records: U[]
 
     result = await this.execute(query, params, options)
