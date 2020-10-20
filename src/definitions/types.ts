@@ -34,4 +34,4 @@ export interface ResultSet extends types.ResultSet {}
 export type Column = { name: string; type: { code: number; info: any } }
 
 // export type Keys<T extends Record> = MongoDotPaths<T, 10>[] | ['*']
-export type Keys<T extends Record> = (keyof T | '*')[]
+export type Keys<T extends Record> = keyof T | '*'

@@ -31,15 +31,15 @@ class Table<T extends Record> extends Child {
     this.cassandra.initialization().then(() => (this.status = Status.ON))
   }
 
-  public async read<U = T>(id: Identity, keys: Keys<T> = ['*'], path?: string, options?: QueryOptions): Promise<U> {
+  public async read<U = T>(id: Identity, keys: Keys<T>[] = ['*'], path?: Keys<T>, options?: QueryOptions): Promise<U> {
     return this.find(`SELECT ${keys.join(',')} FROM ${this.name} WHERE id = ?`, [id], path, options)
   }
 
-  public async all(keys: Keys<T> = ['*'], options?: QueryOptions): Promise<T[]> {
-    return this.filter(`SELECT ${keys.join(',')} FROM ${this.name}`, [], options)
+  public async all(keys: Keys<T>[] = ['*'], path?: Keys<T>, options?: QueryOptions): Promise<T[]> {
+    return this.filter(`SELECT ${keys.join(',')} FROM ${this.name}`, [], path, options)
   }
 
-  public async find<U = T>(query: string, params?: any[], path: string = '', options?: QueryOptions): Promise<U> {
+  public async find<U = T>(query: string, params?: any[], path?: Keys<T>, options?: QueryOptions): Promise<U> {
     let result: ResultSet | Error, record: T
 
     result = await this.execute(query, params, { fetchSize: 1, ...options })
@@ -51,13 +51,14 @@ class Table<T extends Record> extends Child {
     return get(record, path, record)
   }
 
-  public async filter(query: string, params?: any[], options?: QueryOptions): Promise<T[]> {
-    let result: ResultSet | Error, records: T[]
+  public async filter<U = T>(query: string, params?: any[], path?: Keys<T>, options?: QueryOptions): Promise<U[]> {
+    let result: ResultSet | Error, records: U[]
 
     result = await this.execute(query, params, options)
     if (result instanceof Error) return []
 
     records = RowUtils.toRecords(result.columns, result.rows)
+    records = records.map((v: U) => get(v, path, v))
 
     return records
   }
