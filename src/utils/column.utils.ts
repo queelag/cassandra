@@ -1,5 +1,5 @@
-import { get, has, snakeCase } from 'lodash'
-import { Column, Keys, Record } from '../definitions/types'
+import { get, has } from 'lodash'
+import { Column } from '../definitions/types'
 import Regex from '../modules/regex'
 
 class ColumnUtils {
@@ -24,10 +24,6 @@ class ColumnUtils {
     })
 
     return get(column, 'type.code', 0)
-  }
-
-  static toSnakeCase<T extends Record>(v: Keys<T>): string[] {
-    return v.map((w: any) => (w === '*' ? w : snakeCase(w)))
   }
 }
 
