@@ -1,6 +1,6 @@
 import AJV, { ValidateFunction } from 'ajv'
 import { QueryOptions } from 'cassandra-driver'
-import { get, some } from 'lodash'
+import { some } from 'lodash'
 import { deserialize, serialize } from 'v8'
 import Cassandra from '..'
 import { Status } from '../definitions/enums'
@@ -32,34 +32,34 @@ class Table<T extends Record> extends Child {
     this.cassandra.initialization().then(() => (this.status = Status.ON))
   }
 
-  public async read<U = T>(id: Identity, keys: Key<T>[] = ['*'], path?: Key<T>, options?: QueryOptions): Promise<U> {
-    return this.find(`SELECT ${KeyUtils.toSnakeCase(keys).join(',')} FROM ${this.name} WHERE id = ?`, [id], path, options)
+  public async read(id: Identity, keys: Key<T>[] = ['*'], options?: QueryOptions): Promise<T> {
+    return this.find(`SELECT ${KeyUtils.toSnakeCase(keys).join(',')} FROM ${this.name} WHERE id = ?`, [id], options)
   }
 
-  public async all(keys: Key<T>[] = ['*'], path?: Key<T>, options?: QueryOptions): Promise<T[]> {
-    return this.filter(`SELECT ${KeyUtils.toSnakeCase(keys).join(',')} FROM ${this.name}`, [], path, options)
+  public async all(keys: Key<T>[] = ['*'], options?: QueryOptions): Promise<T[]> {
+    return this.filter(`SELECT ${KeyUtils.toSnakeCase(keys).join(',')} FROM ${this.name}`, [], options)
   }
 
-  public async find<U = T>(query: string, params?: any[], path?: Key<T>, options?: QueryOptions): Promise<U> {
+  public async find(query: string, params?: any[], options?: QueryOptions): Promise<T> {
     let result: ResultSet | Error, record: T
 
     result = await this.execute(query, params, { fetchSize: 1, ...options })
-    if (result instanceof Error) return get(clone<T>(this.dummy), path, clone<T>(this.dummy))
+    if (result instanceof Error) return clone<T>(this.dummy)
 
     record = RowUtils.toRecord(result.columns, result.first())
-    if (Object.keys(record).length <= 0) return get(clone<T>(this.dummy), path, clone<T>(this.dummy))
+    if (Object.keys(record).length <= 0) return clone<T>(this.dummy)
 
-    return get(record, path, record)
+    return record
   }
 
-  public async filter<U = T>(query: string, params?: any[], path?: Key<T>, options?: QueryOptions): Promise<U[]> {
-    let result: ResultSet | Error, records: U[]
+  public async filter(query: string, params?: any[], options?: QueryOptions): Promise<T[]> {
+    let result: ResultSet | Error, records: T[]
 
     result = await this.execute(query, params, options)
     if (result instanceof Error) return []
 
     records = RowUtils.toRecords(result.columns, result.rows)
-    records = records.map((v: U) => get(v, path, v))
+    records = records.filter((v: T) => v.id.length > 0)
 
     return records
   }
