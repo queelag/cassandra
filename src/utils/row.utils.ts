@@ -27,13 +27,13 @@ class RowUtils {
         type = ColumnUtils.findTypeByPath(columns, root.concat(k))
 
         switch (true) {
-          case type === DataType.UUID:
+          case type === DataType.UUID || v instanceof types.Uuid:
             r[key] = v ? (v as types.Uuid).toString() : ''
             break
-          case type === DataType.INET:
+          case type === DataType.INET || v instanceof types.InetAddress:
             r[key] = v ? (v as types.InetAddress).toString() : ''
             break
-          case type === DataType.TIMESTAMP:
+          case type === DataType.TIMESTAMP || v instanceof Date:
             r[key] = v ? (v as Date).valueOf() : 0
             break
           case type === DataType.LIST:
