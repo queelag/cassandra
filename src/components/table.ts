@@ -33,11 +33,11 @@ class Table<T extends Record> extends Child {
   }
 
   public async read(id: Identity, keys: Key<T>[] = ['*'], options?: QueryOptions): Promise<T> {
-    return this.find(`SELECT ${KeyUtils.toSnakeCase(keys).join(',')} FROM ${this.name} WHERE id = ?`, [id], options)
+    return this.find(`SELECT ${KeyUtils.join(keys)} FROM ${this.name} WHERE id = ?`, [id], options)
   }
 
   public async all(keys: Key<T>[] = ['*'], options?: QueryOptions): Promise<T[]> {
-    return this.filter(`SELECT ${KeyUtils.toSnakeCase(keys).join(',')} FROM ${this.name}`, [], options)
+    return this.filter(`SELECT ${KeyUtils.join(keys)} FROM ${this.name}`, [], options)
   }
 
   public async find(query: string, params?: any[], options?: QueryOptions): Promise<T> {

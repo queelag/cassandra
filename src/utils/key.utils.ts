@@ -1,9 +1,13 @@
-import { snakeCase } from 'lodash'
+import { snakeCase, uniq } from 'lodash'
 import { Key, Record } from '../definitions/types'
 
 class KeyUtils {
+  static join<T extends Record>(v: Key<T>[]): string {
+    return KeyUtils.toSnakeCase(v).join(',')
+  }
+
   static toSnakeCase<T extends Record>(v: Key<T>[]): string[] {
-    return v.map((w: any) => (w === '*' ? w : snakeCase(w)))
+    return v.includes('*') ? ['*'] : uniq(v.map((w: any) => snakeCase(w)).concat(['id', 'timestamp']))
   }
 }
 
