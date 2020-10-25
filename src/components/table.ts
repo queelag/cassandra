@@ -65,14 +65,15 @@ class Table<T extends Record> extends Child {
   }
 
   public async write(data: T, options?: QueryOptions): Promise<Identity> {
-    let clone: T, id: Identity | Error, result: ResultSet | Error
+    let clone: T, validation: boolean, id: Identity | Error, result: ResultSet | Error
 
     clone = deserialize(serialize(data))
     delete clone.id
     delete clone.timestamp
 
-    if (!this.validate(clone)) {
-      console.error(this.validate.errors)
+    validation = await this.validate(clone)
+    if (!validation) {
+      console.error(this.name, clone, this.validate.errors)
       return ''
     }
 
