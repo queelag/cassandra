@@ -64,14 +64,14 @@ class Table<T extends Record> extends Child {
     return records
   }
 
-  public async write(data: T, options?: QueryOptions): Promise<Identity> {
+  public async write(data: T, timestamp: number = Date.now(), options?: QueryOptions): Promise<Identity> {
     let clone: T, validation: boolean, id: Identity | Error, result: ResultSet | Error
 
     clone = deserialize(serialize(data))
     delete clone.id
     delete clone.timestamp
 
-    validation = await this.validate(clone)
+    validation = this.validate(clone)
     if (!validation) {
       console.error(this.name, clone, this.validate.errors)
       return ''
@@ -81,7 +81,7 @@ class Table<T extends Record> extends Child {
     if (id instanceof Error) return ''
 
     clone.id = id
-    clone.timestamp = Date.now()
+    clone.timestamp = timestamp
 
     result = await this.execute(`INSERT INTO ${this.name} JSON ?`, [JSONUtils.stringify(clone)], options)
     if (result instanceof Error) return ''
