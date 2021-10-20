@@ -1,9 +1,10 @@
 {
-  "name": "@queelag/cassandra",
-  "version": "1.5.2",
-  "main": "index.js",
   "author": "Dario Sechi",
-  "license": "MIT",
+  "dependencies": {
+    "ajv": "^8.2.0",
+    "cassandra-driver": "^4.6.2",
+    "lodash": "^4.17.21"
+  },
   "devDependencies": {
     "@microsoft/api-extractor": "^7.14.0",
     "@types/chance": "^1.1.1",
@@ -20,10 +21,11 @@
     "webpack": "^5.36.1",
     "webpack-cli": "^4.6.0"
   },
-  "dependencies": {
-    "ajv": "^8.2.0",
-    "cassandra-driver": "^4.6.2",
-    "lodash": "^4.17.21"
+  "license": "MIT",
+  "main": "index.js",
+  "name": "@queelag/cassandra",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
   },
   "scripts": {
     "start": "node dist/index.js",
@@ -32,5 +34,6 @@
     "tarball": "yarn version && cp package.json dist/. && cd dist && yarn pack",
     "dts": "yarn api-extractor run --local",
     "deploy": "yarn test && MODE=PRODUCTION yarn build && yarn dts && yarn tarball && yarn publish dist/*.tgz --access public && git push"
-  }
+  },
+  "version": "1.5.2"
 }
