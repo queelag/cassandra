@@ -31,5 +31,5 @@
     "dts": "yarn api-extractor run --local",
     "deploy": "yarn test && yarn build && yarn dts && yarn tarball && yarn publish dist/*.tgz --access public && git push"
   },
-  "version": "1.5.5"
+  "version": "1.5.6"
 }
