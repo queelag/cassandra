@@ -5,7 +5,7 @@
     "declaration": true,
     "declarationDir": "dist/declarations",
     "esModuleInterop": true,
-    "module": "ESNext",
+    "module": "CommonJS",
     "moduleResolution": "node",
     "outDir": "dist",
     "resolveJsonModule": true,
