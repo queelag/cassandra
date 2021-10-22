@@ -1,14 +1,16 @@
 {
+  "$schema": "https://json.schemastore.org/tsconfig.json",
   "compilerOptions": {
-    "module": "CommonJS",
+    "allowSyntheticDefaultImports": true,
     "declaration": true,
-    "declarationDir": "declarations",
-    "outDir": "dist",
-    "moduleResolution": "node",
-    "target": "ESNext",
+    "declarationDir": "dist/declarations",
     "esModuleInterop": true,
-    "experimentalDecorators": true,
-    "resolveJsonModule": true
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "outDir": "dist",
+    "resolveJsonModule": true,
+    "strict": false,
+    "target": "ESNext"
   },
   "include": ["src"]
 }

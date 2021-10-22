@@ -4,5 +4,4 @@ declarations
 .env
 .DS_Store
 yarn-error.log
-.cassandraWorkbench*
 .vscode
