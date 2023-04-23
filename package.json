@@ -20,9 +20,7 @@
   "license": "MIT",
   "main": "index.js",
   "name": "@aracna/cassandra",
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
-  },
+  "private": false,
   "scripts": {
     "start": "node dist/index.js",
     "build": "rm -rf dist && rm -rf declarations && yarn tsc",
